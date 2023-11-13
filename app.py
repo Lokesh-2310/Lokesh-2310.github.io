@@ -2,21 +2,16 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import seaborn as sns
-import matplotlib.pyplot as plt
 import plotly.express as px
 
 
 #analysis code
 ipl=pd.read_csv("IPL Matches 2008-2020.csv")
-# ipl['city']=ipl['city'].replace(['Bengaluru','Bangalore'],'Bangalore')
-# ipl['venue']=ipl['venue'].replace(['M Chinnaswamy Stadium','Punjab Cricket Association Stadium, Mohali'],['M.Chinnaswamy Stadium','Punjab Cricket Association IS Bindra Stadium, Mohali'])
 ipl=ipl.replace(['Rising Pune Supergiants','Delhi Daredevils','M Chinnaswamy Stadium','Punjab Cricket Association Stadium, Mohali','Bengaluru'],['Rising Pune Supergiant','Delhi Capitals','M.Chinnaswamy Stadium','Punjab Cricket Association IS Bindra Stadium, Mohali','Bangalore'])
 ipl['date']=pd.to_datetime(ipl['date'])
 ipl['year']=ipl['date'].dt.year
-# ipl['team1']=ipl['team1'].replace(['Rising Pune Supergiants','Delhi Daredevils'],['Rising Pune Supergiant','Delhi Capitals'])
-# ipl['team2']=ipl['team2'].replace(['Rising Pune Supergiants','Delhi Daredevils'],['Rising Pune Supergiant','Delhi Capitals'])
-# ipl['winner']=ipl['winner'].replace(['Rising Pune Supergiants','Delhi Daredevils'],['Rising Pune Supergiant','Delhi Capitals'])
+
+
 #filling null values
 values=ipl[(ipl['city'].isnull()) & (ipl['venue']=='Sharjah Cricket Stadium')].index
 ipl.loc[values,'city']='Sharjah'
@@ -30,11 +25,9 @@ city_list.insert(0,'Select')
 list_of_team=list(np.union1d(ipl['team1'],ipl['team2']))
 list_of_team.insert(0,'Select')
 
+
 #Websitecode
 st.set_page_config(page_title='IPL|2008-2020|Analysis',layout='wide')
-
-# st.title("*:cricket_bat_and_ball: 2008-2020 :cricket_bat_and_ball:*")
-
 st.sidebar.title("Cricket Analysis")
 
 
@@ -172,6 +165,7 @@ if option1=='Team Vs Team Record':
 
     #choose dataframe according to condition-
     temp_ipl = ipl[((ipl['team1'] == team1) | (ipl['team1'] == team2)) & ((ipl['team2'] == team2) | (ipl['team2'] == team1))]
+
     if ((team1=='Select') or (team2=='Select')):
         st.header('Gallery of some IPL matches')
         col1, col2, col3 = st.columns(3)
@@ -220,10 +214,17 @@ if option1=='Team Vs Team Record':
             winsby_df = pd.DataFrame(l, columns=['Team', 'Wins by', 'Count'])
             st.dataframe(winsby_df,use_container_width=True,hide_index=True)
 
+
+            #d/l method
+            df_method= temp_ipl[temp_ipl['method'] == 'D/L'][['city', 'date', 'venue', 'winner']].rename(columns={'city':'City','date':'Date (yy-mm-dd)','venue':'Venue','winner':'Winner'})
+            if df_method.shape[0]!=0:
+                st.subheader("Duckworth–Lewis–Stern (D/L) method in list")
+                st.dataframe(df_method,use_container_width=True,hide_index=True)
+
+
             #winner count->
             st.subheader("Visualizing winning count of a team")
             winner_df=temp_ipl['winner'].value_counts().reset_index()
-            # fig = plt.figure(figsize=(10, 4))
             fig=px.bar(winner_df,x="winner", y="count",labels={'winner':'Match Winner','count':'Count'},hover_name='winner',color='winner',color_discrete_map={team1:"#CB4154",team2:"#AB0B23"})
             st.plotly_chart(fig)
 
@@ -234,3 +235,4 @@ if option1=='Team Vs Team Record':
             st.subheader('Visualizing Wins by')
             fig=px.bar(winsby_df,x='Team',y='Count',color='Wins by',barmode='group',hover_name='Team',text_auto=True,color_discrete_map={team1:'#AB0B23',team2:'#CB4154'})
             st.plotly_chart(fig)
+            
