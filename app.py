@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
-
+import app2023
 
 #analysis code
 ipl=pd.read_csv("IPL Matches 2008-2020.csv")
@@ -27,19 +27,22 @@ list_of_team.insert(0,'Select')
 
 
 #Websitecode
-st.set_page_config(page_title='IPL|2008-2020|Analysis',layout='wide')
+st.set_page_config(page_title='IPL|Analysis',layout='wide')
 st.sidebar.title("Cricket Analysis")
 
 
 #option selection
 option1 = st.sidebar.selectbox(
         'Choose option',
-        ['Select','Citywise Record','Team Vs Team Record']
+        ['Select','Citywise Record','Team Vs Team Record','2023 IPL']
     )
 
 
 #Select option code-
-if option1=='Select':
+if option1=='2023 IPL':
+    app2023.ipl2023data()
+
+elif option1=='Select':
     st.title('About Indian Premier League (IPL)')
     st.image('images-videos/iplit.png')
     st.write(""" Indian Premier League (IPL), Indian professional Twenty20 (T20) cricket league established in 2008. The league, which is based on a round-robin group and knockout format, has teams in major Indian cities.
@@ -235,4 +238,5 @@ if option1=='Team Vs Team Record':
             st.subheader('Visualizing Wins by')
             fig=px.bar(winsby_df,x='Team',y='Count',color='Wins by',barmode='group',hover_name='Team',text_auto=True,color_discrete_map={team1:'#AB0B23',team2:'#CB4154'})
             st.plotly_chart(fig)
+
             
